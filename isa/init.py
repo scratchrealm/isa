@@ -38,6 +38,15 @@ def init():
     
     with open(isa_project_yaml_fname, 'w') as f:
         yaml.dump(project_config, f)
+    
+    with open(gitignore_fname, 'w') as f:
+        f.write('''
+*.h5
+*.avi
+*.ogv
+*.npy
+*.pkl
+''')
 
 def _initialize_session_dir(dirname: str):
     h5_fname = _find_singular_file_in_dir(dirname, '.h5')
