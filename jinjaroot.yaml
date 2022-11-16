@@ -1,0 +1,8 @@
+projectName: isa
+pythonProjectVersion: 0.1.0
+projectAuthor: Jeremy Magland and Ralph Peterson
+projectAuthorEmail: jmagland@flatironinstitute.org
+projectDescription: "Isa (Ee-suh) is a visualization and annotation tool for sound source location."
+projectUrl: https://github.com/scratchrealm/isa
+projectBugTrackerUrl: https://github.com/scratchrealm/isa/issues
+pythonPackageDir: .

@@ -51,10 +51,9 @@ Initialize the project
 ```bash
 cd my-project
 isa init
-# follow the interactive prompts
 ```
 
-This will create a `isa-project.yml` file at the root project directory and `isa-session.yml` files in each session folder.
+This will create a `isa-project.yaml` file at the root project directory and `isa-session.yaml` files in each session folder.
 
 ## Update the project
 
