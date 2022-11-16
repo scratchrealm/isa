@@ -32,17 +32,17 @@ Use the following directory structure for your project
 
 ```
 my-project/
-  experiment1/
+  session1/
     video-file-name.avi
     audio-file-name.h5
-  experiment2/
-  experiment3/
+  session2/
+  session3/
   ...
 ```
 
 TODO: explain about the project name
 
-TODO: explain about the experiment names
+TODO: explain about the session names
 
 TODO: explain about the `.avi` and `.h5` files
 
@@ -54,11 +54,11 @@ isa init
 # follow the interactive prompts
 ```
 
-This will create a `isa-project.yml` file at the root project directory and `isa-experiment.yml` files in each experiment folder.
+This will create a `isa-project.yml` file at the root project directory and `isa-session.yml` files in each session folder.
 
 ## Update the project
 
-To update the processing for all experiments, use
+To update the processing for all sessions, use
 
 ```
 isa update --all
