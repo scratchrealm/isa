@@ -5,12 +5,11 @@ import h5py
 import numpy as np
 from matplotlib.pyplot import specgram
 import pickle
-import click
 from .init import _find_singular_file_in_dir
 
 
 def create_spectrograms(dirname: str, output_pkl_fname: str):
-    with open(f'{dirname}/config.yml', 'r') as f:
+    with open(f'{dirname}/isa-session.yaml', 'r') as f:
         config = yaml.safe_load(f)
     print('USING CONFIG')
     print(config)

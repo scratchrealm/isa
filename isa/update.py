@@ -3,20 +3,21 @@ from typing import Union
 import yaml
 import kachery_cloud as kcl
 import cv2
-from .init import _find_singular_file_in_dir
 from .create_index_md import create_index_md
 from .convert_avi_to_ogv import convert_avi_to_ogv
 from .create_spectrograms import create_spectrograms
 from .auto_detect_vocalizations import auto_detect_vocalizations
 from .create_gui_data import create_gui_data
+from ._find_singular_file_in_dir import _find_singular_file_in_dir
+from ._project_config import _get_project_config_value
 
 
 def update(session: Union[str, None]=None, all: bool=False):
     if all:
-        if session is not None:
+        if session:
             raise Exception('Cannot specify session with all')
-        config = _get_project_config()
-        for session_name in config['sessions']:
+        session_names = _get_project_config_value('sessions')
+        for session_name in session_names:
             update(session=session_name)
         return
     if session is None:
@@ -78,11 +79,3 @@ def _set_session_config(dirname: str, config: dict):
     config_yaml_fname = f'{dirname}/isa-session.yaml'
     with open(config_yaml_fname, 'w') as f:
         yaml.dump(config, f)
-
-def _get_project_config():
-    isa_project_yaml_fname = 'isa-project.yaml'
-    if not os.path.exists(isa_project_yaml_fname):
-        raise Exception(f'File does not exist: {isa_project_yaml_fname}')
-    with open(isa_project_yaml_fname, 'r') as f:
-        config = yaml.safe_load(f)
-    return config

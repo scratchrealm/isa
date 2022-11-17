@@ -8,7 +8,7 @@ from figurl.core.serialize_wrapper import _serialize
 
 
 def auto_detect_vocalizations(dirname: str, output_uri_fname: str):
-    with open(f'{dirname}/config.yml', 'r') as f:
+    with open(f'{dirname}/isa-session.yaml', 'r') as f:
         config = yaml.safe_load(f)
     print('USING CONFIG')
     print(config)

@@ -6,7 +6,7 @@ from figurl.core.serialize_wrapper import _serialize
 
 def create_gui_data(dirname: str, output_uri_fname: str):
     # Read the config for the dataset
-    with open(f'{dirname}/config.yml', 'r') as f:
+    with open(f'{dirname}/isa-session.yaml', 'r') as f:
         config = yaml.safe_load(f)
     print('USING CONFIG')
     print(config)

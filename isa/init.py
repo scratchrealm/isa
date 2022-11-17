@@ -2,51 +2,76 @@ import os
 import h5py
 import yaml
 import json
+import click
 from typing import List
 import numpy as np
+from ._find_singular_file_in_dir import _find_singular_file_in_dir
+from ._project_config import _get_project_config_value, _set_project_config_value
 
 
 def init():
-    gitignore_fname = '.gitignore'
-    isa_project_yaml_fname = 'isa-project.yaml'
-    if os.path.exists(gitignore_fname):
-        raise Exception(f'File already exists: {gitignore_fname}')
-    if os.path.exists(isa_project_yaml_fname):
-        raise Exception(f'File already exists: {isa_project_yaml_fname}')
-    
-    session_names: List[str] = []
-    names = os.listdir('.')
-    for session_name in names:
-        if os.path.isdir(session_name):
-            if not session_name.startswith('.'):
-                print('====================================================')
-                print(f'INITIALIZING SESSION: {session_name}')
-                _initialize_session_dir(f'./{session_name}')
-                session_names.append(session_name)
-    
-    if os.path.exists(isa_project_yaml_fname):
-        with open(isa_project_yaml_fname, 'r') as f:
-            project_config = yaml.safe_load(f)
+    # initialize git repository
+    if os.path.exists('.git'):
+        if not click.confirm('This project has already been initialized as a git repo. Proceed?', default=True):
+            return
+        need_to_check_repo_url = True
     else:
-        project_config = {}
+        if click.confirm('Initialize git repository?', default=True):
+            os.system('git init')
+            need_to_check_repo_url = True
+        else:
+            need_to_check_repo_url = False
     
-    project_config['sessions'] = session_names
-    if 'repository_url' not in project_config:
-        project_config['repository_url'] = 'https://github.com/<user>/<repo>'
-    if 'use_singularity_for_ffmpeg' not in project_config:
-        project_config['use_singularity_for_ffmpeg'] = False
+    if need_to_check_repo_url:
+        repo_url = _get_project_config_value('repository_url')
+        if repo_url is not None:
+            print(f'Using repository: {repo_url}')
+        else:
+            repo_url = click.prompt('Create a new repository on GitHub with a name like isa-project-1 and enter the url (e.g., https://github.com/user/isa-project-1). Or leave empty to skip this step.', default='', type=str)
+            if repo_url:
+                _set_project_config_value('repository_url', repo_url)
     
-    with open(isa_project_yaml_fname, 'w') as f:
-        yaml.dump(project_config, f)
-    
-    with open(gitignore_fname, 'w') as f:
-        f.write('''
-*.h5
-*.avi
-*.ogv
-*.npy
-*.pkl
+    # Create .gitignore
+    gitignore_fname = '.gitignore'
+    if os.path.exists(gitignore_fname):
+        do_write_gitignore = click.confirm('.gitignore file already exists. Overwrite?', default=False)
+    else:
+        do_write_gitignore = True
+    if do_write_gitignore:
+        print('Creating .gitignore')
+        with open(gitignore_fname, 'w') as f:
+            f.write('''
+# ignore everything by default, but do traverse directories
+*
+!*/
+
+# whitelist
+!.gitignore
+!*.yaml
+!*.uri
+!*.url
+!*.md
 ''')
+    
+    session_names_in_yaml = _get_project_config_value('sessions')
+    if session_names_in_yaml is None:
+        session_names: List[str] = []
+        names = os.listdir('.')
+        for session_name in names:
+            if os.path.isdir(session_name):
+                if not session_name.startswith('.'):
+                    print('====================================================')
+                    print(f'INITIALIZING SESSION: {session_name}')
+                    _initialize_session_dir(f'./{session_name}')
+                    session_names.append(session_name)
+        _set_project_config_value('sessions', session_names)
+    else:
+        click.prompt('Sessions have already been initialized in this project. You will need to manually initialize any additional sessions. Press enter to continue.', default='')
+
+    
+    use_singularity_for_ffmpeg = click.confirm('Do you want to use singularity for ffmpeg?', default=_get_project_config_value('use_singularity_for_ffmpeg'))
+    _set_project_config_value('use_singularity_for_ffmpeg', use_singularity_for_ffmpeg)
+    
 
 def _initialize_session_dir(dirname: str):
     h5_fname = _find_singular_file_in_dir(dirname, '.h5')
@@ -84,12 +109,3 @@ def _get_audio_sr_from_h5(h5_file: str):
         d = json.loads(f['config'][()].decode('utf-8'))
         audio_sr_hz = d['microphone_sample_rate']
     return audio_sr_hz
-
-def _find_singular_file_in_dir(dirname: str, extension: str):
-    fnames = os.listdir(dirname)
-    f_fnames = [f for f in fnames if f.endswith(extension)]
-    if len(f_fnames) == 0:
-        return None
-    if len(f_fnames) > 1:
-        raise Exception(f'More than one {extension} file found in directory: {dirname}')
-    return f'{dirname}/{f_fnames[0]}'
