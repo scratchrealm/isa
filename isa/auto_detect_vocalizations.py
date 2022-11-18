@@ -14,8 +14,8 @@ def auto_detect_vocalizations(dirname: str, output_uri_fname: str):
     print(config)
 
     output_fname = f'{dirname}/annotations.uri'
-    if os.path.exists(output_fname):
-        raise Exception(f'File already exists: {output_fname}')
+    # if os.path.exists(output_fname):
+    #     raise Exception(f'File already exists: {output_fname}')
 
     spectrograms_fname = f'{dirname}/spectrograms.pkl'
     print(f'Loading {spectrograms_fname}')
