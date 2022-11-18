@@ -1,5 +1,6 @@
 import click
 import isa
+from .update import IsaUpdateOpts
 
 
 @click.group(help="Isa command-line client")
@@ -35,10 +36,12 @@ def update(
     isa.update(
         session=session,
         all=all,
-        redo_spectrograms=redo_spectrograms,
-        redo_video_conversion=redo_video_conversion,
-        no_vocalization_detection=no_vocalization_detection,
-        redo_vocalization_detection=redo_vocalization_detection
+        opts=IsaUpdateOpts(
+            redo_spectrograms=redo_spectrograms,
+            redo_video_conversion=redo_video_conversion,
+            no_vocalization_detection=no_vocalization_detection,
+            redo_vocalization_detection=redo_vocalization_detection
+        )
     )
     isa.create_index_md('.')
 
