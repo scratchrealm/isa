@@ -20,7 +20,7 @@ def create_spectrograms(dirname: str, output_pkl_fname: str):
     # between 0 and 255... values below this in the  are set to zero
     # this will affect auto detection of vocalization intervals
     # this will also affect the data size for the data passed to the GUI
-    threshold = 20
+    threshold = 60
     
     h5_fname = _find_singular_file_in_dir(dirname, '.h5')
     if h5_fname is None:
