@@ -107,3 +107,11 @@ git push
 ```
 
 Navigate to the GitHub repo in your browser and open the `index.md` file.
+
+## Advanced options
+
+You can force-recompute various steps. For more information, run
+
+```
+isa update --help
+```
