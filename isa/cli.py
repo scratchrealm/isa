@@ -19,6 +19,7 @@ def update(session: str, all: bool):
     if not session and not all:
         raise Exception('Either use the --session or the --all option')
     isa.update(session=session, all=all)
+    isa.create_index_md('.')
 
 
 cli.add_command(init)

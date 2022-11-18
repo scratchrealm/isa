@@ -3,7 +3,6 @@ from typing import Union
 import yaml
 import kachery_cloud as kcl
 import cv2
-from .create_index_md import create_index_md
 from .convert_avi_to_ogv import convert_avi_to_ogv
 from .create_spectrograms import create_spectrograms
 from .auto_detect_vocalizations import auto_detect_vocalizations
@@ -24,8 +23,6 @@ def update(session: Union[str, None]=None, all: bool=False):
         raise Exception('Must specify session')
     
     _update_session_dir(f'./{session}')
-
-    create_index_md('.')
 
 def _update_session_dir(dirname: str):
     config = _get_session_config(dirname)
