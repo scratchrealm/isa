@@ -17,10 +17,13 @@ def create_spectrograms(dirname: str, output_pkl_fname: str):
     duration_sec = config['duration_sec']
     audio_sr_hz = config['audio_sr_hz']
 
-    # between 0 and 255... values below this in the  are set to zero
-    # this will affect auto detection of vocalization intervals
-    # this will also affect the data size for the data passed to the GUI
-    threshold = 60
+    freq_range=[130, 230]
+
+    # between 0 and 100... percentile cutoff in the target freq band
+    # in spectrogram_for_gui
+    # everything below the value is set to zero
+    # affects detection and compressed file size
+    threshold_pct = 95
     
     h5_fname = _find_singular_file_in_dir(dirname, '.h5')
     if h5_fname is None:
@@ -58,7 +61,10 @@ def create_spectrograms(dirname: str, output_pkl_fname: str):
     print('Scaling spectogram data')
     # Nf x Nt
     spectrogram_for_gui = np.floor((spectrogram_for_gui - minval) / (maxval - minval) * 255).astype(np.uint8)
-    spectrogram_for_gui[spectrogram_for_gui < threshold] = 0
+
+    threshold = np.percentile(spectrogram_for_gui[freq_range[0]:freq_range[1]], threshold_pct)
+    print(f'Using threshold: {threshold} ({threshold_pct} pct)')
+    spectrogram_for_gui[spectrogram_for_gui <= threshold] = 0
 
     print(f'Writing {output_pkl_fname}')
     with open(output_pkl_fname, 'wb') as fb:

@@ -13,6 +13,8 @@ def auto_detect_vocalizations(dirname: str, output_uri_fname: str):
     print('USING CONFIG')
     print(config)
 
+    freq_range=[130, 230]
+
     output_fname = f'{dirname}/annotations.uri'
     # if os.path.exists(output_fname):
     #     raise Exception(f'File already exists: {output_fname}')
@@ -28,7 +30,7 @@ def auto_detect_vocalizations(dirname: str, output_uri_fname: str):
     print(f'Spectrogram sampling rate (Hz): {sr_spectrogram}')
 
     print('Auto detecting vocalizations')
-    auto_vocalizations = _auto_detect_vocalizations(spectrogram_for_gui[130:230], sampling_frequency=sr_spectrogram)
+    auto_vocalizations = _auto_detect_vocalizations(spectrogram_for_gui[freq_range[0]:freq_range[1]], sampling_frequency=sr_spectrogram)
 
     annotations = {
         'samplingFrequency': sr_spectrogram,
