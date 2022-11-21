@@ -60,13 +60,15 @@ def init():
         for session_name in names:
             if os.path.isdir(session_name):
                 if not session_name.startswith('.'):
-                    print('====================================================')
-                    print(f'INITIALIZING SESSION: {session_name}')
-                    _initialize_session_dir(f'./{session_name}')
                     session_names.append(session_name)
         _set_project_config_value('sessions', session_names)
     else:
         click.prompt('Sessions have already been initialized in this project. You will need to manually initialize any additional sessions. Press enter to continue.', default='')
+        session_names = session_names_in_yaml
+    for session_name in session_names:
+        print('====================================================')
+        print(f'INITIALIZING SESSION: {session_name}')
+        _initialize_session_dir(f'./{session_name}')
 
     
     use_singularity_for_ffmpeg = click.confirm('Do you want to use singularity for ffmpeg?', default=_get_project_config_value('use_singularity_for_ffmpeg'))

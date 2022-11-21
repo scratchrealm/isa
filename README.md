@@ -115,3 +115,16 @@ You can force-recompute various steps. For more information, run
 ```
 isa update --help
 ```
+
+## Adding a session
+
+Create a new directory for the session and add .h5 and .avi files. The name of the directory should be the session ID.
+
+Add the session ID to the list of sessions in isa-project.yaml
+
+Initialize and update the new session (replace SESSION_ID with the session ID)
+
+```bash
+isa init
+isa --update --session SESSION_ID
+```
