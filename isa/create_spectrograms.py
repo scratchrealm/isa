@@ -23,7 +23,7 @@ def create_spectrograms(dirname: str, output_pkl_fname: str):
     # in spectrogram_for_gui
     # everything below the value is set to zero
     # affects detection and compressed file size
-    threshold_pct = 98
+    threshold_pct = 99.8
     
     h5_fname = _find_singular_file_in_dir(dirname, '.h5')
     if h5_fname is None:
