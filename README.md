@@ -89,6 +89,7 @@ git push -u origin main
 To update the processing for all sessions, use
 
 ```bash
+module load singularity #if running on FI cluster
 isa update --all
 ```
 
