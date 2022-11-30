@@ -5,7 +5,7 @@ from ._project_config import _get_project_config_value
 def convert_avi_to_ogv(avi_fname: str, ogv_fname: str):
     use_singularity_for_ffmpeg = _get_project_config_value('use_singularity_for_ffmpeg')
 
-    cmd = f'ffmpeg -i {avi_fname} -c:v libtheora -q:v 7 -c:a libvorbis -q:a 4 {ogv_fname}'
+    cmd = f'ffmpeg -i {os.path.abspath(avi_fname)} -c:v libtheora -q:v 7 -c:a libvorbis -q:a 4 {os.path.abspath(ogv_fname)}'
 
     if use_singularity_for_ffmpeg:
         print(avi_fname)
