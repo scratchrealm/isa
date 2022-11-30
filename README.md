@@ -35,7 +35,7 @@ Use the following directory structure for your project
 my-project/
   session1/
     video-file-name.avi
-    audio-file-name.h5
+    audio-file-name.h5 (or audio-file-name.wav)
   session2/
   session3/
   ...
@@ -45,7 +45,7 @@ TODO: explain about the project name
 
 TODO: explain about the session names
 
-TODO: explain about the `.avi` and `.h5` files
+TODO: explain about the `.avi` and `.h5` (or `.wav`) files
 
 Initialize the project
 
@@ -118,13 +118,20 @@ isa update --help
 
 ## Adding a session
 
-Create a new directory for the session and add .h5 and .avi files. The name of the directory should be the session ID.
+Create a new directory for the session and add .h5 (or .wav) and .avi files. The name of the directory should be the session ID.
 
-Add the session ID to the list of sessions in isa-project.yaml
+Add the session ID to the list of sessions in isa-project.yaml by running
 
-Initialize and update the new session (replace SESSION_ID with the session ID)
+```bash
+# replace SESSION_ID with the session ID
+isa add SESSION_ID
+```
+
+Initialize and update the new session
 
 ```bash
 isa init
+
+# replace SESSION_ID with the session ID
 isa --update --session SESSION_ID
 ```

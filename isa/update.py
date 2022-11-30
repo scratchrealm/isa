@@ -82,7 +82,7 @@ def _update_session_dir(
         recreate_gui_data = True
     
     annotations_uri_fname = f'{dirname}/annotations.uri'
-    do_auto_detect = (not os.path.exists(dirname) and not opts.no_vocalization_detection) or opts.redo_vocalization_detection
+    do_auto_detect = (not os.path.exists(annotations_uri_fname) and not opts.no_vocalization_detection) or opts.redo_vocalization_detection
     if do_auto_detect:
         auto_detect_vocalizations(dirname, annotations_uri_fname)
         recreate_gui_data = True

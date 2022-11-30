@@ -11,6 +11,11 @@ def cli():
 def init():
     isa.init()
 
+@click.command(help="Add a session to an isa project")
+@click.argument('session_id')
+def add(session_id: str):
+    isa.add(session_id)
+
 @click.command(help="Update one or more sessions")
 @click.option('--session', required=False, default='', help="Session to process, if not using --all")
 @click.option('--all', is_flag=True, help="Process all sessions")
@@ -47,4 +52,5 @@ def update(
 
 
 cli.add_command(init)
+cli.add_command(add)
 cli.add_command(update)

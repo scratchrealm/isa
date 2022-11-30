@@ -3,6 +3,7 @@ import os
 import yaml
 import h5py
 import numpy as np
+from scipy.io import wavfile
 from matplotlib.pyplot import specgram
 import pickle
 from .init import _find_singular_file_in_dir
@@ -26,22 +27,33 @@ def create_spectrograms(dirname: str, output_pkl_fname: str):
     threshold_pct = 99.8
     
     h5_fname = _find_singular_file_in_dir(dirname, '.h5')
-    if h5_fname is None:
-        raise Exception(f'No .h5 file found in directory: {dirname}')
-    print(f'USING H5: {h5_fname}')
+    wav_fname = _find_singular_file_in_dir(dirname, '.wav')
+    if h5_fname is None and wav_fname is None:
+        raise Exception(f'No .h5 or .wav file found in directory: {dirname}')
+    if h5_fname is not None and wav_fname is not None:
+        raise Exception(f'Both .h5 and .wav files found in directory: {dirname}')
+    audio_fname: str = h5_fname if h5_fname is not None else wav_fname
+    print(f'USING AUDIO: {audio_fname}')
 
     print('Extracting audio signals')
-    with h5py.File(h5_fname, 'r') as f:
-        ch1 = np.array(f['ai_channels/ai0'])
-        ch2 = np.array(f['ai_channels/ai1'])
-        ch3 = np.array(f['ai_channels/ai2'])
-        ch4 = np.array(f['ai_channels/ai3'])
-        X = np.stack([ch1, ch2, ch3, ch4]).T
+    if h5_fname is not None:
+        with h5py.File(h5_fname, 'r') as f:
+            ch1 = np.array(f['ai_channels/ai0'])
+            ch2 = np.array(f['ai_channels/ai1'])
+            ch3 = np.array(f['ai_channels/ai2'])
+            ch4 = np.array(f['ai_channels/ai3'])
+            X = np.stack([ch1, ch2, ch3, ch4]).T
 
+            # crop to duration
+            X = X[0:int(duration_sec * audio_sr_hz)]
+    else:
+        sr, audio = wavfile.read(wav_fname)
+        # n_samples = audio.shape[0]
+        # n_channels = audio.shape[1]
         # crop to duration
-        X = X[0:int(duration_sec * audio_sr_hz)]
-
-        num_channels = X.shape[1]
+        X = audio[0:int(duration_sec * audio_sr_hz)]
+    
+    num_channels = X.shape[1]
 
     print('Computing spectrograms')
     spectrograms = []

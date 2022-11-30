@@ -3,6 +3,7 @@ import h5py
 import yaml
 import json
 import click
+from scipy.io import wavfile
 from typing import List
 import numpy as np
 from ._find_singular_file_in_dir import _find_singular_file_in_dir
@@ -63,7 +64,6 @@ def init():
                     session_names.append(session_name)
         _set_project_config_value('sessions', session_names)
     else:
-        click.prompt('Sessions have already been initialized in this project. You will need to manually initialize any additional sessions. Press enter to continue.', default='')
         session_names = session_names_in_yaml
     for session_name in session_names:
         print('====================================================')
@@ -77,18 +77,31 @@ def init():
 
 def _initialize_session_dir(dirname: str):
     h5_fname = _find_singular_file_in_dir(dirname, '.h5')
-    if h5_fname is None:
-        raise Exception(f'Cannot find .h5 file in directory: {dirname}')
-    print(f'USING H5: {h5_fname}')
+    wav_fname = _find_singular_file_in_dir(dirname, '.wav')
+    if h5_fname is None and wav_fname is None:
+        raise Exception(f'Cannot find .h5 or .wav file in directory: {dirname}')
+    if h5_fname is not None and wav_fname is not None:
+        raise Exception(f'Found both .h5 and .wav files in directory: {dirname}')
+    audio_fname = h5_fname if h5_fname is not None else wav_fname
+    print(f'USING AUDIO: {wav_fname}')
 
-    audio_sr_hz = _get_audio_sr_from_h5(h5_fname)
+    if h5_fname is not None:
+        audio_sr_hz = _get_audio_sr_from_h5(h5_fname)
+        
+        # get first channel in order to compute duration
+        print('Determining duration')
+        with h5py.File(h5_fname, 'r') as f:
+            ch1 = np.array(f['ai_channels/ai0'])
+        duration_sec = len(ch1) / audio_sr_hz
+    elif wav_fname is not None:
+        audio_sr_hz, audio = wavfile.read(wav_fname)
+        n_samples = audio.shape[0]
+        # n_channels = audio.shape[1]
+        duration_sec = n_samples / audio_sr_hz
+    else:
+        raise Exception('Unexpected')
+
     print(f'Audio sampling rate (Hz): {audio_sr_hz}')
-
-    # get first channel in order to compute duration
-    print('Determining duration')
-    with h5py.File(h5_fname, 'r') as f:
-        ch1 = np.array(f['ai_channels/ai0'])
-    duration_sec = len(ch1) / audio_sr_hz
     print(f'Audio duration (sec): {duration_sec}')
 
     config_yaml_fname = f'{dirname}/isa-session.yaml'
