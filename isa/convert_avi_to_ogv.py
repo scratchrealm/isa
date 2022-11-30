@@ -16,4 +16,6 @@ def convert_avi_to_ogv(avi_fname: str, ogv_fname: str):
             raise Exception(f'Files must be in the same parent directory: {avi_fname} {ogv_fname}')
         cmd = f'singularity exec docker://jrottenberg/ffmpeg --bind {dirname1}:{dirname1} {cmd}'
     
+    print('Converting to .ogv using the following command')
+    print(cmd)
     os.system(cmd)
