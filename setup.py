@@ -6,7 +6,10 @@ setup(
     include_package_data = True,
     install_requires=[
         'click',
-        'kachery_cloud>=0.3.7'
+        'h5py',
+        'matplotlib',
+        'kachery_cloud>=0.3.8',
+        'figurl>=0.2.16'
     ],
     entry_points={
         'console_scripts': [
