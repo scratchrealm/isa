@@ -13,7 +13,7 @@ Requirements
 
 It is recommended that you use a Conda environment.
 
-Clone this repo, then
+For now, during development, you must install isa from source. Clone this repo, then
 
 ```bash
 cd isa
@@ -24,15 +24,15 @@ Initialize a [kachery-cloud](https://github.com/flatironinstitute/kachery-cloud#
 
 ```bash
 kachery-cloud-init
-# follow the instructions to associate your client with your Google user name on kachery-cloud
+# follow the instructions to associate your client with your GitHub user name on kachery-cloud
 ```
 
 ## Create a project
 
 Use the following directory structure for your project
 
-```
-my-project/
+```bash
+my-project/ # replace with the name of your project
   session1/
     video-file-name.avi
     audio-file-name.h5 (or audio-file-name.wav)
@@ -40,12 +40,6 @@ my-project/
   session3/
   ...
 ```
-
-TODO: explain about the project name
-
-TODO: explain about the session names
-
-TODO: explain about the `.avi` and `.h5` (or `.wav`) files
 
 Initialize the project
 
@@ -55,7 +49,7 @@ isa init
 # Follow the interactive prompts
 ```
 
-This will guide you through the process of configuring your project and creating a new GitHub repository.
+This will guide you through the process of configuring your project and initializing a new local GitHub repository.
 
 You will find an `isa-project.yaml` file at the root project directory and `isa-session.yaml` files in each session folder.
 
