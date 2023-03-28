@@ -3,16 +3,20 @@
 Isa (Ee-suh) is a visualization and annotation tool for sound source location.
 
 ## Installation and setup
+It is recommended that you use a Conda environment.
 
 Requirements
 * Linux or Mac
 * Conda (recommended)
 * Python >= 3.8
-* [ffmpeg](https://ffmpeg.org/) or [singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html)
 * pyqt and opencv-python
+* [ffmpeg](https://ffmpeg.org/) or [singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html)
 
-It is recommended that you use a Conda environment.
-
+NOTE: We recommend installing ffmpeg via Homebrew. You can install Homebrew and ffmpeg using the following commands:
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+brew install ffmpeg --HEAD
+```
 For now, during development, you must install isa from source. Clone this repo, then
 
 ```bash
