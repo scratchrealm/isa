@@ -132,5 +132,5 @@ Initialize and update the new session
 isa init
 
 # replace SESSION_ID with the session ID
-isa --update --session SESSION_ID
+isa update --session SESSION_ID
 ```
