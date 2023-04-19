@@ -1,0 +1,23 @@
+.ControlPanel {
+    background: #ececec;
+}
+
+.ControlPanel button {
+    background: #ffffff;
+    border: solid rgba(0,0,0,0);
+}
+
+.ControlPanel button:disabled {
+    background: #efefef;
+}
+
+.ControlPanel button:hover:enabled {
+    border: solid lightgray
+}
+.ControlPanel button:active:enabled {
+    background: #eedd00;
+}
+
+.HelpButton:hover {
+    color: blue;
+}
