@@ -11,11 +11,10 @@ Requirements
 * Python >= 3.8
 * pyqt and opencv-python - todo: why is pyqt required?
 
-For now, during development, you must install isa from source. Clone this repo, then
+Install isa-ssl from PyPI:
 
 ```bash
-cd isa
-pip install -e .
+pip install isa-ssl
 ```
 
 Install rtcshare
