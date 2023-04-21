@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 import yaml
 import pickle
 import json
@@ -12,7 +12,9 @@ def auto_detect_vocalizations(session: str, output_json_fname: str):
     print('USING CONFIG')
     print(config)
 
-    freq_range=[130, 230]
+    auto_detect_freq_range = config['auto_detect_freq_range']
+    spectrogram_df = config['spectrogram_df']
+    freq_range=[int(auto_detect_freq_range[0] / spectrogram_df), int(auto_detect_freq_range[1] / spectrogram_df)]
 
     spectrograms_fname = f'{dirname}/spectrograms.pkl'
     print(f'Loading {spectrograms_fname}')

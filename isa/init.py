@@ -71,6 +71,8 @@ def _initialize_or_update_session_dir(session: str):
     print(f'Audio duration (sec): {audio_duration_sec}')
     config['audio_sr_hz'] = audio_sr_hz
     config['audio_duration_sec'] = audio_duration_sec
+    if not 'auto_detect_freq_range' in config:
+        config['auto_detect_freq_range'] = [0, audio_sr_hz / 2]
 
     ##########################################
     # VIDEO

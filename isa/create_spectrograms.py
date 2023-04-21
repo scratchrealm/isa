@@ -70,6 +70,7 @@ def create_spectrograms(session: str):
     print(f'Spectrogram sampling rate (Hz): {sr_spectrogram}')
     _set_session_config_value(session, 'spectrogram_sr_hz', sr_spectrogram)
     _set_session_config_value(session, 'spectrogram_num_frequencies', len(spectrogram_frequencies))
+    _set_session_config_value(session, 'spectrogram_df', float(spectrogram_frequencies[1] - spectrogram_frequencies[0]))
     spectrogram_for_gui = sum(spectrograms)
 
     print('Auto detecting maxval')

@@ -12,9 +12,13 @@ def init():
     isa.init()
 
 @click.command(help="Add a session to an isa project")
-@click.argument('session_id')
-def add(session_id: str):
-    isa.add(session_id)
+@click.argument('session_id', required=False, default='')
+@click.option('--all', is_flag=True, help="Add all sessions")
+def add(session_id: str, all: bool):
+    if not all:
+        if not session_id:
+            raise Exception('Either use the --all option or specify a session id')
+    isa.add(session_id, all=all)
 
 @click.command(help="Update one or more sessions")
 @click.option('--session', required=False, default='', help="Session to process, if not using --all")
