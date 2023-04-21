@@ -15,27 +15,37 @@ type Props = {
 }
 
 const SessionView: FunctionComponent<Props> = ({width, height}) => {
-    const [video, setVideo] = useState<{uri: string, width: number, height: number, samplingFrequency: number}>()
+    const [video, setVideo] = useState<{uri: string, width: number, height: number, samplingFrequency: number, numFrames: number}>()
+	const [spectrogram, setSpectrogram] = useState<{uri: string, samplingFrequency: number, durationSec: number, numFrequencies: number}>()
     useEffect(() => {
         (async () => {
             const a = await getFileData('$dir/isa-session.yaml', () => {}, {responseType: 'text'})
             const isaSession: any = YAML.load(a)
             setVideo({
-                uri: `$dir/${isaSession.video_file}`,
-                width: isaSession.video_dims[1],
-            	height: isaSession.video_dims[0],
-                samplingFrequency: isaSession.video_sr_hz
+                uri: `$dir/${isaSession.video_fname}`,
+                width: isaSession.video_width,
+            	height: isaSession.video_height,
+                samplingFrequency: isaSession.video_fps,
+				numFrames: isaSession.video_num_frames
             })
+			setSpectrogram({
+				uri: `$dir/spectrogram_for_gui.zarr`,
+				samplingFrequency: isaSession.spectrogram_sr_hz,
+				durationSec: isaSession.audio_duration_sec,
+				numFrequencies: isaSession.spectrogram_num_frequencies
+			})
         })()
     }, [])
 
     if (!video) return <div>Loading video info</div>
+	if (!spectrogram) return <div>Loading spectrogram info</div>
     return (
 		<SetupTimeseriesSelection>
 			<SessionViewChild
 				width={width}
 				height={height}
 				video={video}
+				spectrogram={spectrogram}
 			/>
 		</SetupTimeseriesSelection>
     )
@@ -45,13 +55,16 @@ type ChildProps = {
     width: number
     height: number
     spectrogram?: {
-        data: number[][]
+        uri: string,
         samplingFrequency: number
+		durationSec: number
+		numFrequencies: number
     }
     video?: {
         uri: string,
         width: number
         height: number
+		numFrames: number
         samplingFrequency: number
     }
 }

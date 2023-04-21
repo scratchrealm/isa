@@ -1,12 +1,15 @@
 import { DefaultToolbarWidth, TimeScrollView, TimeScrollViewPanel, usePanelDimensions, useTimeseriesSelectionInitialization, useTimeRange, useTimeseriesMargins } from "@figurl/timeseries-views";
-import { FunctionComponent, useCallback, useEffect, useMemo } from "react";
+import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
+import SpectrogramClient from "./SpectrogramClient";
 
 type Props ={
 	width: number
 	height: number
 	spectrogram?: {
-		data: number[][]
+		uri: string
 		samplingFrequency: number
+		durationSec: number
+		numFrequencies: number
 	}
 }
 
@@ -15,8 +18,36 @@ const panelSpacing = 4
 type PanelProps = {}
 
 const SpectrogramWidget: FunctionComponent<Props> = ({width, height, spectrogram}) => {
-	const nTimepoints = spectrogram?.data.length || 0
-	const samplingFrequency = spectrogram?.samplingFrequency || 1
+	const [spectrogramClient, setSpectrogramClient] = useState<SpectrogramClient>()
+	useEffect(() => {
+		if (!spectrogram) return
+		const spectrogramClient = new SpectrogramClient(spectrogram.uri, spectrogram.samplingFrequency, spectrogram.durationSec, spectrogram.numFrequencies)
+		spectrogramClient.initialize().then(() => {
+			setSpectrogramClient(spectrogramClient)
+		}).catch((err) => {
+			console.error(err)
+			console.error('Problem initializing spectrogram client')
+		})
+	}, [spectrogram])
+	if (!spectrogramClient) return <div>Loading spectrogram client</div>
+	return (
+		<SpectrogramWidgetChild
+			width={width}
+			height={height}
+			spectrogramClient={spectrogramClient}
+		/>
+	)
+}
+
+type ChildProps = {
+	width: number
+	height: number
+	spectrogramClient: SpectrogramClient
+}
+
+const SpectrogramWidgetChild: FunctionComponent<ChildProps> = ({width, height, spectrogramClient}) => {
+	const nTimepoints = spectrogramClient.numTimepoints
+	const samplingFrequency = spectrogramClient.samplingFrequency
 	useTimeseriesSelectionInitialization(0, nTimepoints / samplingFrequency)
     const {visibleStartTimeSec, visibleEndTimeSec, setVisibleTimeRange} = useTimeRange()
 
@@ -43,28 +74,26 @@ const SpectrogramWidget: FunctionComponent<Props> = ({width, height, spectrogram
 		if (!nTDownsampled) return undefined
 		
 		let imageData: ImageData | undefined = undefined
-		if (spectrogram) {
-			const data: number[] = []
-			const nF = spectrogram?.data[0].length || 0
-			for (let ii = 0; ii < nF; ii++) {
-				for (let it = 0; it < nTDownsampled; it++) {
-					let max0 = 0
-					for (let aa = 0; aa < downsampleFactor; aa++) {
-						const jj = i1 + it * downsampleFactor + aa
-						if ((0 <= jj) && (jj < nTimepoints)) {
-							max0 = Math.max(max0, spectrogram.data[jj][nF - 1 - ii])
-						}
+		const data: number[] = []
+		const nF = spectrogramClient.numFrequencies
+		for (let ii = 0; ii < nF; ii++) {
+			for (let it = 0; it < nTDownsampled; it++) {
+				let max0 = 0
+				for (let aa = 0; aa < downsampleFactor; aa++) {
+					const jj = i1 + it * downsampleFactor + aa
+					if ((0 <= jj) && (jj < nTimepoints)) {
+						max0 = Math.max(max0, spectrogramClient.getValue(jj, nF - 1 - ii))
 					}
-					const c = colorForSpectrogramValue(max0)
-					data.push(...c)
 				}
+				const c = colorForSpectrogramValue(max0)
+				data.push(...c)
 			}
-			const clampedData = Uint8ClampedArray.from(data)
-			imageData = new ImageData(clampedData, nTDownsampled, nF)
 		}
+		const clampedData = Uint8ClampedArray.from(data)
+		imageData = new ImageData(clampedData, nTDownsampled, nF)
 		
 		return {imageData, i1, i2}
-    }, [spectrogram, samplingFrequency, visibleStartTimeSec, visibleEndTimeSec, nTimepoints, panelWidth])
+    }, [spectrogramClient, samplingFrequency, visibleStartTimeSec, visibleEndTimeSec, nTimepoints, panelWidth])
 
 	const paintPanel = useCallback((context: CanvasRenderingContext2D, props: PanelProps) => {
 		if (!imageDataInfo) return

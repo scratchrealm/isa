@@ -69,6 +69,7 @@ def create_spectrograms(session: str):
         spectrograms.append(s.T) # Use transpose so we have Nt x Nf
     print(f'Spectrogram sampling rate (Hz): {sr_spectrogram}')
     _set_session_config_value(session, 'spectrogram_sr_hz', sr_spectrogram)
+    _set_session_config_value(session, 'spectrogram_num_frequencies', len(spectrogram_frequencies))
     spectrogram_for_gui = sum(spectrograms)
 
     print('Auto detecting maxval')

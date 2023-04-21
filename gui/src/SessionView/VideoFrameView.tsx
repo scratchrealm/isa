@@ -11,7 +11,6 @@ type Props ={
 }
 
 const VideoFrameView: FunctionComponent<Props> = ({src, timeSec, width, height, affineTransform}) => {
-	console.log('--- video frame view', src)
 	const [srcUrl, setSrcUrl] = useState<string>()
 	const [seeking, setSeeking] = useState<boolean>(false)
 	const [refreshCode, setRefreshCode] = useState(0)
