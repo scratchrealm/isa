@@ -3,15 +3,11 @@ import { serviceQuery } from "@figurl/interface"
 const chunkSize = 10000
 
 class SpectrogramClient {
-    #isInitialized: boolean = false
     #onDataRecievedCallbacks: (() => void)[] = []
-    #chunks: {[chunkIndex: number]: Uint8Array} = {}
-    #fetchingChunks = new Set<number>()
+    #chunks: {[dsFactor: number]: {[chunkIndex: number]: Uint8Array}} = {}
+    #fetchingChunks = new Set<string>()
     constructor(private uri: string, public samplingFrequency: number, public durationSec: number, public numFrequencies: number) {
 
-    }
-    async initialize() {
-        this.#isInitialized = true
     }
     onDataRecieved(cb: () => void) {
         this.#onDataRecievedCallbacks.push(cb)
@@ -19,25 +15,26 @@ class SpectrogramClient {
     public get numTimepoints() {
         return Math.ceil(this.durationSec * this.samplingFrequency)
     }
-    getValue(t: number, f: number) {
+    getValue(dsFactor: number, t: number, f: number) {
         const chunkIndex = Math.floor(t / chunkSize)
-        const chunk = this.#chunks[chunkIndex]
+        const chunk = (this.#chunks[dsFactor] || {})[chunkIndex]
         if (!chunk) {
-            this._fetchChunk(chunkIndex) // initiate fetching of the chunk
+            this._fetchChunk(dsFactor, chunkIndex) // initiate fetching of the chunk
             return NaN
         }
         const i = Math.floor(t) % chunkSize
         return chunk[i * this.numFrequencies + f]
     }
-    async _fetchChunk(i: number) {
-        if (this.#fetchingChunks.has(i)) return
-        this.#fetchingChunks.add(i)
+    async _fetchChunk(dsFactor: number, i: number) {
+        const code = `${dsFactor}-${i}`
+        if (this.#fetchingChunks.has(code)) return
+        this.#fetchingChunks.add(code)
         const {result, binaryPayload} = await serviceQuery(
             'zarr',
             {
                 type: 'get_array_chunk',
                 path: this.uri,
-                name: '/spectrogram',
+                name: dsFactor === 1 ? '/spectrogram' : `/spectrogram_ds${dsFactor}`,
                 slices: [
                     {
                         start: i * chunkSize,
@@ -52,11 +49,12 @@ class SpectrogramClient {
                 ]
             }
         )
-        this.#fetchingChunks.delete(i)
+        this.#fetchingChunks.delete(code)
         if (result.dtype !== 'uint8') {
             throw Error(`Unexpected data type for spectrogram zarr array: ${result.dataType}`)
         }
-        this.#chunks[i] = new Uint8Array(binaryPayload)
+        if (!this.#chunks[dsFactor]) this.#chunks[dsFactor] = {}
+        this.#chunks[dsFactor][i] = new Uint8Array(binaryPayload)
         this.#onDataRecievedCallbacks.forEach(cb => {cb()})
     }
 }
