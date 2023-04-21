@@ -7,9 +7,8 @@ setup(
     install_requires=[
         'click',
         'h5py',
-        'matplotlib',
-        'kachery_cloud>=0.3.8',
-        'figurl>=0.2.16'
+        'zarr',
+        'matplotlib'
     ],
     entry_points={
         'console_scripts': [

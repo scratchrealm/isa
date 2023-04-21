@@ -1,11 +1,19 @@
+from typing import Union
 import os
 
 
-def _find_singular_file_in_dir(dirname: str, extension: str):
+def _find_singular_file_in_dir(dirname: str, extensions: Union[str, list[str]]):
+    if type(extensions) == str:
+        extensions = [extensions]
     fnames = os.listdir(dirname)
-    f_fnames = [f for f in fnames if f.endswith(extension)]
-    if len(f_fnames) == 0:
+    matching_fnames: list[str] = []
+    for fname in fnames:
+        for extension in extensions:
+            if fname.endswith(extension):
+                matching_fnames.append(fname)
+                break
+    if len(matching_fnames) == 0:
         return None
-    if len(f_fnames) > 1:
+    if len(matching_fnames) > 1:
         raise Exception(f'More than one {extension} file found in directory: {dirname}')
-    return f'{dirname}/{f_fnames[0]}'
+    return matching_fnames[0]

@@ -9,14 +9,8 @@ Requirements
 * Linux or Mac
 * Conda (recommended)
 * Python >= 3.8
-* pyqt and opencv-python
-* [ffmpeg](https://ffmpeg.org/) or [singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html)
+* pyqt and opencv-python - todo: why is pyqt required?
 
-NOTE: We recommend installing ffmpeg via Homebrew. You can install Homebrew and ffmpeg using the following commands:
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-brew install ffmpeg --HEAD
-```
 For now, during development, you must install isa from source. Clone this repo, then
 
 ```bash
@@ -24,12 +18,9 @@ cd isa
 pip install -e .
 ```
 
-Initialize a [kachery-cloud](https://github.com/flatironinstitute/kachery-cloud#readme) client
+Install rtcshare
 
-```bash
-kachery-cloud-init
-# follow the instructions to associate your client with your GitHub user name on kachery-cloud
-```
+Todo: provide instructions for rtcshare
 
 ## Create a project
 
@@ -50,62 +41,27 @@ Initialize the project
 ```bash
 cd my-project
 isa init
-# Follow the interactive prompts
+# Follow the interactive prompts if there are any
 ```
-
-This will guide you through the process of configuring your project and initializing a new local GitHub repository.
 
 You will find an `isa-project.yaml` file at the root project directory and `isa-session.yaml` files in each session folder.
 
-Commit the new files to the local git repo:
-
-```bash
-# Check the status to see the changes
-git status
-
-# Add all files whitelisted in .gitignore
-git add .
-
-# Check the status to see what will be added
-git status
-
-# Commit the changes
-git commit -m "initialize project"
-```
-
-Configure the git remote and push the new files
-
-```bash
-# fill in the appropriate <user> and <repo>
-git remote add origin https://github.com/user/repo.git
-git branch -M main
-git push -u origin main
-```
+To compute the spectrograms and prepare other data, you will need to update the sessions (see below).
 
 ## Updating the project
 
 To update the processing for all sessions, use
 
 ```bash
-module load singularity #if running on FI cluster
 isa update --all
 ```
 
-Then, if ready, commit and push the changes to the GitHub repo
+Or to update a single session, use
 
 ```bash
-# Check to see if something has changed
-git status
-
-# If something has changed, add and commit
-git add .
-git status
-# Fill in a custom message based on what you have changed
-git commit -m "update project"
-git push
+# replace SESSION_ID with the session ID
+isa update --session SESSION_ID
 ```
-
-Navigate to the GitHub repo in your browser and open the `index.md` file.
 
 ## Advanced options
 
