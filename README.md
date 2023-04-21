@@ -1,6 +1,6 @@
 # isa
 
-Isa (Ee-suh) is a visualization and annotation tool for sound source location.
+Isa (Ee-suh) is a visualization and annotation tool for sound source localization.
 
 ## Installation and setup
 It is recommended that you use a Conda environment.
