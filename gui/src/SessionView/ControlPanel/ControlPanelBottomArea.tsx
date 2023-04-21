@@ -101,7 +101,7 @@ const TopRow: FunctionComponent<{width: number, height: number, label: string, o
 }
 
 const SaveAnnotationsRow: FunctionComponent<{width: number, height: number, onCommand: (c: Command) => void, dirty: boolean, saving: boolean, hasGithubUri: boolean}> = ({width, height, onCommand, dirty, saving, hasGithubUri}) => {
-	const W = (width - spacing * 4) / 3
+	const W = (width - spacing * 3) / 2
 	const buttonStyle: React.CSSProperties = {
 		height: 25,
 		width: W
@@ -113,13 +113,10 @@ const SaveAnnotationsRow: FunctionComponent<{width: number, height: number, onCo
 			</div>
 			<div style={{position: 'absolute', top: labelHeight, width}}>
 				<div style={{position: 'absolute', left: spacing}}>
-					<button disabled={((!dirty) || saving || (!hasGithubUri))} onClick={() => onCommand('save-to-github')} style={buttonStyle}>Save to GitHub</button>
+					<button disabled={((!dirty) || saving)} onClick={() => onCommand('save')} style={buttonStyle}>Save</button>
 				</div>
 				<div style={{position: 'absolute', left: spacing + W + spacing}}>
-					<button disabled={(!dirty) || saving} onClick={() => onCommand('save-snapshot')} style={buttonStyle}>Save snapshot</button>
-				</div>
-				<div style={{position: 'absolute', left: spacing + W + spacing + W + spacing}}>
-					<button onClick={() => onCommand('export-as-json')} style={buttonStyle}>Export as JSON</button>
+				<button onClick={() => onCommand('export-as-json')} style={buttonStyle}>Export as JSON</button>
 				</div>
 			</div>
 		</div>

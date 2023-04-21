@@ -1,5 +1,5 @@
 import { randomAlphaString } from "@figurl/core-utils";
-import { getFileData, storeFileData, storeGithubFileData, useUrlState } from "@figurl/interface";
+import { getFileData, serviceQuery, storeFileData, storeGithubFileData, useUrlState } from "@figurl/interface";
 import { useTimeseriesSelection } from "@figurl/timeseries-views";
 import { FunctionComponent, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useVocalizations, VocalizationContext } from "../../context-vocalizations";
@@ -15,7 +15,7 @@ type Props ={
 	height: number
 }
 
-export type Command = 'save-to-github' | 'save-snapshot' | 'export-as-json' | 'prev' | 'next' | 'first' | 'last' | 'random-without-pose' | 'accept-vocalization' | 'unaccept-vocalization' | 'accept-all-vocalizations' | 'unaccept-all-vocalizations' | 'add-vocalization' | 'delete-vocalization' | 'help'
+export type Command = 'save' | 'export-as-json' | 'prev' | 'next' | 'first' | 'last' | 'random-without-pose' | 'accept-vocalization' | 'unaccept-vocalization' | 'accept-all-vocalizations' | 'unaccept-all-vocalizations' | 'add-vocalization' | 'delete-vocalization' | 'help'
 
 type SaveState = {
 	savedObjectJson?: string
@@ -97,7 +97,7 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 		downloadTextFile('vocalizations.json', x)
 	}, [object])
 
-	const handleSaveToGithub = useCallback(() => {
+	const handleSave = useCallback(() => {
 		if (!object) return
 		if (!uri) return
 		const x = JSONStringifyDeterministic(object)
@@ -105,7 +105,11 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 		setErrorString('')
 		;(async () => {
 			try {
-				await storeGithubFileData({fileData: x, uri})
+				await serviceQuery('isa', {
+					type: 'set_annotations',
+					session_path: '$dir',
+					annotations: object
+				})
 				setSaveState({
 					savedObjectJson: x,
 					savedUri: uri
@@ -121,42 +125,14 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 		})()
 	}, [object, uri])
 
-	const handleSaveSnapshot = useCallback(() => {
-		if (!object) return
-		if (!uri) return
-		const x = JSONStringifyDeterministic(object)
-		setSaving(true)
-		setErrorString('')
-		;(async () => {
-			try {
-				const uri = await storeFileData(x)
-				updateUrlState({vocalizations: uri})
-				setSaveState({
-					savedObjectJson: x,
-					savedUri: uri
-				})
-			}
-			catch(err: any) {
-				setErrorString(`Problem saving file data: ${err.message}`)
-				setSaving(false)
-			}
-			finally {
-				setSaving(false)
-			}
-		})()
-	}, [object, updateUrlState, uri])
-
 	const {visible: helpVisible, handleOpen: handleOpenHelp, handleClose: handleCloseHelp} = useModalDialog()
 
 	const handleCommand = useCallback((c: Command) => {
 		if (c === 'export-as-json') {
 			handleExportAsJson()
 		}
-		else if (c === 'save-snapshot') {
-			handleSaveSnapshot()
-		}
-		else if (c === 'save-to-github') {
-			handleSaveToGithub()
+		else if (c === 'save') {
+			handleSave()
 		}
 		else if (c === 'accept-vocalization') {
 			if (!selectedVocalization) return
@@ -210,7 +186,7 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 		else if (c === 'help') {
 			handleOpenHelp()
 		}
-	}, [handleExportAsJson, addVocalizationLabel, removeVocalizationLabel, selectedVocalization, handleSaveToGithub, selectNextVocalization, selectPreviousVocalization, selectFirstVocalization, selectLastVocalization, selectRandomVocalizationWithoutPose, handleSaveSnapshot, addVocalizationLabelToAll, removeVocalizationLabelFromAll, removeVocalization, focusFrameInterval, addVocalization, handleOpenHelp])
+	}, [handleExportAsJson, addVocalizationLabel, removeVocalizationLabel, selectedVocalization, handleSave, selectNextVocalization, selectPreviousVocalization, selectFirstVocalization, selectLastVocalization, selectRandomVocalizationWithoutPose, addVocalizationLabelToAll, removeVocalizationLabelFromAll, removeVocalization, focusFrameInterval, addVocalization, handleOpenHelp])
 
 	const margin = 10
 	const spacing = 20
