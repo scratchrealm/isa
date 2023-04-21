@@ -1,5 +1,7 @@
 import { readDir, startListeningToParent } from "@figurl/interface";
+import { SetupAnnotations } from "@figurl/timeseries-views";
 import { FunctionComponent, useEffect, useState } from "react";
+import { SetupVocalizations } from "./context-vocalizations";
 import SessionView from "./SessionView/SessionView";
 import useWindowDimensions from "./useWindowDimensions";
 
@@ -28,10 +30,14 @@ const MainWindow: FunctionComponent = () => {
         return <div>Unknown folder type</div>
     }
     return (
-        <SessionView
-            width={width}
-            height={height}
-        />
+        <SetupAnnotations>
+            <SetupVocalizations>
+                <SessionView
+                    width={width}
+                    height={height}
+                />
+            </SetupVocalizations>
+        </SetupAnnotations>
     )
 }
 

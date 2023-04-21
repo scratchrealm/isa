@@ -1,10 +1,18 @@
-import { FunctionComponent, PropsWithChildren, useMemo, useReducer } from "react";
+import { getFileData } from "@figurl/interface";
+import { FunctionComponent, PropsWithChildren, useEffect, useMemo, useReducer } from "react";
 import VocalizationsContext, { defaultVocalizationSelection, defaultVocalizationState, vocalizationReducer, vocalizationSelectionReducer } from "./VocalizationContext";
 
 const SetupVocalizations: FunctionComponent<PropsWithChildren> = (props) => {
 	const [vocalizationState, vocalizationDispatch] = useReducer(vocalizationReducer, defaultVocalizationState)
 	const [vocalizationSelection, vocalizationSelectionDispatch] = useReducer(vocalizationSelectionReducer, defaultVocalizationSelection)
     const value = useMemo(() => ({vocalizationState, vocalizationDispatch, vocalizationSelection, vocalizationSelectionDispatch}), [vocalizationState, vocalizationDispatch, vocalizationSelection, vocalizationSelectionDispatch])
+	useEffect(() => {
+		(async () => {
+			const a = await getFileData(`$dir/annotations.json`, () => {}, {responseType: 'json'})
+			console.log('--- a', a)
+			vocalizationDispatch({type: 'setVocalizationState', vocalizationState: a})
+		})()
+	}, [])
 	// const {urlState} = useUrlState()
 	// const first = useRef<boolean>(true)
 	// useEffect(() => {
