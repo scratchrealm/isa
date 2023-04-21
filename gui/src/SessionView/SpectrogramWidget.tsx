@@ -23,12 +23,7 @@ const SpectrogramWidget: FunctionComponent<Props> = ({width, height, spectrogram
 	useEffect(() => {
 		if (!spectrogram) return
 		const spectrogramClient = new SpectrogramClient(spectrogram.uri, spectrogram.samplingFrequency, spectrogram.durationSec, spectrogram.numFrequencies)
-		spectrogramClient.initialize().then(() => {
-			setSpectrogramClient(spectrogramClient)
-		}).catch((err) => {
-			console.error(err)
-			console.error('Problem initializing spectrogram client')
-		})
+		setSpectrogramClient(spectrogramClient)
 	}, [spectrogram])
 	if (!spectrogramClient) return <div>Loading spectrogram client</div>
 	return (
@@ -73,32 +68,26 @@ const SpectrogramWidgetChild: FunctionComponent<ChildProps> = ({width, height, s
 		if (visibleEndTimeSec === undefined) return undefined
 		let i1 = Math.floor(visibleStartTimeSec * samplingFrequency) - 1
 		let i2 = Math.floor(visibleEndTimeSec * samplingFrequency) + 1
-		const downsampleFactor = Math.max(1, Math.floor((i2 - i1) / (panelWidth)))
-		i1 = Math.floor(i1 / downsampleFactor) * downsampleFactor
-		i2 = Math.ceil(i2 / downsampleFactor) * downsampleFactor
-		let nT = i2 - i1
-		if (!nT) return undefined
-		let nTDownsampled = nT / downsampleFactor
-		if (!nTDownsampled) return undefined
+		const downsampleFactor = determinePower3DownsampleFactor(i2 - i1, panelWidth)
+
+		const i1_ds = Math.floor(i1 / downsampleFactor)
+		const i2_ds = Math.ceil(i2 / downsampleFactor)
+
+		let nT_ds = i2_ds - i1_ds
+		if (!nT_ds) return undefined
 		
 		let imageData: ImageData | undefined = undefined
 		const data: number[] = []
 		const nF = spectrogramClient.numFrequencies
-		for (let ii = 0; ii < nF; ii++) {
-			for (let it = 0; it < nTDownsampled; it++) {
-				let max0 = 0
-				for (let aa = 0; aa < downsampleFactor; aa++) {
-					const jj = i1 + it * downsampleFactor + aa
-					if ((0 <= jj) && (jj < nTimepoints)) {
-						max0 = Math.max(max0, spectrogramClient.getValue(jj, nF - 1 - ii))
-					}
-				}
-				const c = colorForSpectrogramValue(max0)
+		for (let ff = 0; ff < nF; ff++) {
+			for (let it = 0; it < nT_ds; it++) {
+				const val = spectrogramClient.getValue(downsampleFactor, i1_ds + it, nF - 1 - ff)
+				const c = colorForSpectrogramValue(val)
 				data.push(...c)
 			}
 		}
 		const clampedData = Uint8ClampedArray.from(data)
-		imageData = new ImageData(clampedData, nTDownsampled, nF)
+		imageData = new ImageData(clampedData, nT_ds, nF)
 		
 		return {imageData, i1, i2}
     }, [spectrogramClient, samplingFrequency, visibleStartTimeSec, visibleEndTimeSec, nTimepoints, panelWidth, refreshCode])
@@ -148,6 +137,14 @@ const SpectrogramWidgetChild: FunctionComponent<ChildProps> = ({width, height, s
 			height={height}
 		/>
 	)
+}
+
+const determinePower3DownsampleFactor = (n: number, target: number) => {
+	let factor = 1
+	while (n / (factor * 3) > target) {
+		factor *= 3
+	}
+	return factor
 }
 
 const colorForSpectrogramValue = (v: number) => {
