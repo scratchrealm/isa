@@ -10,7 +10,6 @@ type Props ={
 	errorString: string
 	saving: boolean
 	dirty: boolean
-	hasGithubUri: boolean
 	selectedVocalization: Vocalization | undefined
 	focusFrameInterval?: [number, number]
 	label: string
@@ -24,7 +23,7 @@ const labelHeight = 16
 const spacing = 10
 const labelFontSize = 12
 
-const ControlPanelBottomArea: FunctionComponent<Props> = ({width, height, onCommand, errorString, saving, dirty, hasGithubUri, selectedVocalization, focusFrameInterval, label}) => {
+const ControlPanelBottomArea: FunctionComponent<Props> = ({width, height, onCommand, errorString, saving, dirty, selectedVocalization, focusFrameInterval, label}) => {
 	return (
 		<div style={{position: 'absolute', width, height}}>
 			<div style={{position: 'absolute'}}>
@@ -34,7 +33,7 @@ const ControlPanelBottomArea: FunctionComponent<Props> = ({width, height, onComm
 				<SelectedVocalizationRow width={width} height={rowHeight2} onCommand={onCommand} selectedVocalization={selectedVocalization} focusFrameInterval={focusFrameInterval} />
 			</div>
 			<div style={{position: 'absolute', top: topRowHeight + rowHeight2}}>
-				<SaveAnnotationsRow width={width} height={rowHeight} onCommand={onCommand} dirty={dirty} saving={saving} hasGithubUri={hasGithubUri} />
+				<SaveAnnotationsRow width={width} height={rowHeight} onCommand={onCommand} dirty={dirty} saving={saving} />
 			</div>
 			<div style={{position: 'absolute', top: topRowHeight + rowHeight2 + rowHeight, fontSize: labelFontSize}}>
 				<Help className="HelpButton" onClick={() => {onCommand('help')}} />
@@ -100,7 +99,7 @@ const TopRow: FunctionComponent<{width: number, height: number, label: string, o
 	)
 }
 
-const SaveAnnotationsRow: FunctionComponent<{width: number, height: number, onCommand: (c: Command) => void, dirty: boolean, saving: boolean, hasGithubUri: boolean}> = ({width, height, onCommand, dirty, saving, hasGithubUri}) => {
+const SaveAnnotationsRow: FunctionComponent<{width: number, height: number, onCommand: (c: Command) => void, dirty: boolean, saving: boolean}> = ({width, height, onCommand, dirty, saving}) => {
 	const W = (width - spacing * 3) / 2
 	const buttonStyle: React.CSSProperties = {
 		height: 25,

@@ -19,7 +19,6 @@ export type Command = 'save' | 'export-as-json' | 'prev' | 'next' | 'first' | 'l
 
 type SaveState = {
 	savedObjectJson?: string
-	savedUri?: string
 }
 
 const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
@@ -44,52 +43,17 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 		] as [number, number]
 	}, [vocalizationState, currentTimeInterval])
 
-	const uri = urlState['vocalizations'] || ''
-	const hasGithubUri = uri.startsWith('gh://')
 	const object = vocalizationState
 
 	const [saving, setSaving] = useState<boolean>(false)
 
 	const [saveState, setSaveState] = useState<SaveState>({})
 	const dirty = useMemo(() => {
-		if ((uri === saveState.savedUri) && (JSONStringifyDeterministic(object || {}) === saveState.savedObjectJson)) {
+		if (JSONStringifyDeterministic(object || {}) === saveState.savedObjectJson) {
 			return false
 		}
 		return true
-	}, [object, saveState, uri])
-
-	///////////////////////////////////////////////////////////////
-	const first = useRef<boolean>(true)
-	useEffect(() => {
-		if (!vocalizationDispatch) return
-		if (!first.current) return
-		if (uri) {
-			getFileData(uri, () => {}, {responseType: 'binary'}).then((x) => {
-				const dec = new TextDecoder()
-				const uri2 = dec.decode(x)
-				if (!uri2) {
-					console.warn('Empty state')
-					return
-				}
-				getFileData(uri2, () => {}, {responseType: 'json'}).then((y) => {
-					vocalizationDispatch({type: 'setVocalizationState', vocalizationState: y})
-					setSaveState({
-						savedObjectJson: JSONStringifyDeterministic(x),
-						savedUri: uri
-					})
-				}).catch((err: Error) => {
-					console.warn('Problem getting state')
-					console.warn(err)
-					setErrorString(`Error getting resolved URI ${uri2}`)
-				})
-			}).catch((err: Error) => {
-				console.warn('Problem getting state')
-				console.warn(err)
-				setErrorString(`Error getting ${uri}`)
-			})
-		}
-		first.current = false
-	}, [uri, vocalizationDispatch])
+	}, [object, saveState])
 
 	const handleExportAsJson = useCallback(() => {
 		if (!object) return
@@ -100,7 +64,6 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 	const handleSave = useCallback(() => {
 		console.log('--- debug 1')
 		if (!object) return
-		if (!uri) return
 		console.log('--- debug 2')
 		const x = JSONStringifyDeterministic(object)
 		setSaving(true)
@@ -115,8 +78,7 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 				})
 				console.log('--- debug 4')
 				setSaveState({
-					savedObjectJson: x,
-					savedUri: uri
+					savedObjectJson: x
 				})
 			}
 			catch(err: any) {
@@ -127,7 +89,7 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 				setSaving(false)
 			}
 		})()
-	}, [object, uri])
+	}, [object])
 
 	const {visible: helpVisible, handleOpen: handleOpenHelp, handleClose: handleCloseHelp} = useModalDialog()
 
@@ -205,7 +167,7 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 				<ControlPanelTopArea width={width - 2 * margin} height={topHeight} />
 			</div>
 			<div style={{position: 'absolute', left: margin, top: margin + topHeight + spacing, width: width - 2 * margin, height: bottomHeight}}>
-				<ControlPanelBottomArea width={width - 2 * margin} height={bottomHeight} onCommand={handleCommand} errorString={errorString} saving={saving} dirty={dirty} hasGithubUri={hasGithubUri} selectedVocalization={selectedVocalization} focusFrameInterval={focusFrameInterval} label={label} />
+				<ControlPanelBottomArea width={width - 2 * margin} height={bottomHeight} onCommand={handleCommand} errorString={errorString} saving={saving} dirty={dirty} selectedVocalization={selectedVocalization} focusFrameInterval={focusFrameInterval} label={label} />
 			</div>
 			<ModalWindow
 				open={helpVisible}
