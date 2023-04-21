@@ -22,5 +22,6 @@ class IsaService:
             annotations_fname = f'{session_fullpath}/annotations.json'
             with open(annotations_fname, 'w') as f:
                 json.dump(annotations, f)
+            return {'success': True}, b''
         else:
             raise Exception(f'Unexpected query type: {type0}')

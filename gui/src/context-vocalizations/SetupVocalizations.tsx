@@ -9,7 +9,6 @@ const SetupVocalizations: FunctionComponent<PropsWithChildren> = (props) => {
 	useEffect(() => {
 		(async () => {
 			const a = await getFileData(`$dir/annotations.json`, () => {}, {responseType: 'json'})
-			console.log('--- a', a)
 			vocalizationDispatch({type: 'setVocalizationState', vocalizationState: a})
 		})()
 	}, [])
