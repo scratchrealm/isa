@@ -19,6 +19,7 @@ type PanelProps = {}
 
 const SpectrogramWidget: FunctionComponent<Props> = ({width, height, spectrogram}) => {
 	const [spectrogramClient, setSpectrogramClient] = useState<SpectrogramClient>()
+	const [refreshCode, setRefreshCode] = useState(0)
 	useEffect(() => {
 		if (!spectrogram) return
 		const spectrogramClient = new SpectrogramClient(spectrogram.uri, spectrogram.samplingFrequency, spectrogram.durationSec, spectrogram.numFrequencies)
@@ -50,10 +51,17 @@ const SpectrogramWidgetChild: FunctionComponent<ChildProps> = ({width, height, s
 	const samplingFrequency = spectrogramClient.samplingFrequency
 	useTimeseriesSelectionInitialization(0, nTimepoints / samplingFrequency)
     const {visibleStartTimeSec, visibleEndTimeSec, setVisibleTimeRange} = useTimeRange()
+	const [refreshCode, setRefreshCode] = useState(0)
 
 	useEffect(() => {
 		setVisibleTimeRange(0, Math.min(nTimepoints / samplingFrequency, 20))
 	}, [nTimepoints, samplingFrequency, setVisibleTimeRange])
+
+	useEffect(() => {
+		spectrogramClient.onDataRecieved(() => {
+			setRefreshCode(c => c + 1)
+		})
+	}, [spectrogramClient])
 
 	const margins = useTimeseriesMargins(timeseriesLayoutOpts)
 	const panelCount = 1
@@ -93,7 +101,7 @@ const SpectrogramWidgetChild: FunctionComponent<ChildProps> = ({width, height, s
 		imageData = new ImageData(clampedData, nTDownsampled, nF)
 		
 		return {imageData, i1, i2}
-    }, [spectrogramClient, samplingFrequency, visibleStartTimeSec, visibleEndTimeSec, nTimepoints, panelWidth])
+    }, [spectrogramClient, samplingFrequency, visibleStartTimeSec, visibleEndTimeSec, nTimepoints, panelWidth, refreshCode])
 
 	const paintPanel = useCallback((context: CanvasRenderingContext2D, props: PanelProps) => {
 		if (!imageDataInfo) return

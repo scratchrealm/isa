@@ -104,6 +104,15 @@ def create_spectrograms(session: str):
     print(f'Writing {spectrogram_for_gui_zarr_fname}')
     root_group = zarr.open(spectrogram_for_gui_zarr_fname, mode="w")
     root_group.create_dataset("spectrogram", data=spectrogram_for_gui, chunks=(10000, len(spectrogram_frequencies)))
+
+    ds_factor = 3
+    previous_spectrogram = spectrogram_for_gui
+    while ds_factor < len(spectrogram_times):
+        spectrogram_for_gui_downsampled = downsample_spectrogram_using_max(previous_spectrogram, ds_factor=3)
+        root_group.create_dataset(f"spectrogram_ds{ds_factor}", data=spectrogram_for_gui_downsampled, chunks=(10000, len(spectrogram_frequencies)))
+        previous_spectrogram = spectrogram_for_gui_downsampled
+        ds_factor *= 3
+
     root_group.attrs['spectrogram_sr_hz'] = sr_spectrogram
     root_group.create_dataset("frequencies", data=spectrogram_frequencies)
     root_group.create_dataset("times", data=spectrogram_times)
@@ -120,3 +129,13 @@ def _auto_detect_spectrogram_maxval(spectrogram: np.array, *, sr_spectrogram: fl
         i += chunk_num_samples
     v = np.median(chunk_maxvals)
     return v
+
+def downsample_spectrogram_using_max(spectrogram: np.ndarray, *, ds_factor: int):
+    Nt = spectrogram.shape[0]
+    Nf = spectrogram.shape[1]
+    Nt_ds = Nt // ds_factor
+    spectrogram_ds = np.zeros((Nt_ds, Nf), dtype=spectrogram.dtype)
+    spectrogram = spectrogram[:Nt_ds * ds_factor, :]
+    spectrogram_reshaped = spectrogram.reshape((Nt_ds, ds_factor, Nf))
+    spectrogram_ds = np.max(spectrogram_reshaped, axis=1)
+    return spectrogram_ds
