@@ -2,6 +2,7 @@ import os
 from typing import Union
 from dataclasses import dataclass
 import yaml
+import pandas as pd
 from .create_spectrograms import create_spectrograms
 from .auto_detect_vocalizations import auto_detect_vocalizations
 from ._project_config import _get_project_config_value
@@ -18,6 +19,7 @@ def update(
     all: bool=False,
     opts: IsaUpdateOpts=IsaUpdateOpts()
 ):
+    print(f'Updating session: {session}')
     if opts.redo_spectrograms:
         if opts.no_vocalization_detection and opts.redo_vocalization_detection:
             raise Exception('You cannot specify both redo_vocalization_detection and no_vocalization_detection')

@@ -3,14 +3,25 @@ import yaml
 import pickle
 import json
 import numpy as np
+import pandas as pd
+from ._find_singular_file_in_dir import _find_singular_file_in_dir
 
 
 def auto_detect_vocalizations(session: str, output_json_fname: str):
     dirname = f'./{session}'
     with open(f'{dirname}/isa-session.yaml', 'r') as f:
         config = yaml.safe_load(f)
-    print('USING CONFIG')
-    print(config)
+    
+    try:
+        csv_fname = _find_singular_file_in_dir(dirname, ['.csv'])
+    except:
+        csv_fname = None
+
+    if csv_fname is not None:
+        print(f'Generating annotations.json from {csv_fname}')
+        csv_path = f'{dirname}/{csv_fname}'
+        annotations = _generate_annotations_from_csv(csv_path, sampling_frequency=config['audio_sr_hz'])
+        return
 
     auto_detect_freq_range = config['auto_detect_freq_range']
     spectrogram_df = config['spectrogram_df']
@@ -72,3 +83,24 @@ def _auto_detect_vocalizations(spectrogram: np.array, *, sampling_frequency: flo
                     vocalization_start_frame = None
                     vocalization_last_active_frame = None
     return vocalizations
+
+def _generate_annotations_from_csv(csv_fname: str, *, sampling_frequency: float):
+    # read in the csv file
+    x = pd.read_csv(csv_fname, header=None)
+
+    vocalizations = []
+    for r in range(len(x[0])):
+        vocalization = {
+            "vocalizationId": f"{r}",
+            "startFrame": int(x[0][r] * sampling_frequency),
+            "endFrame": int(x[1][r] * sampling_frequency),
+            "labels": []
+        }
+        vocalizations.append(vocalization)
+    
+    annotations = {
+        "samplingFrequency": sampling_frequency,
+        "vocalizations": vocalizations
+    }
+    
+    return annotations
