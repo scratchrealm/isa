@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 import os
 import json
 
@@ -8,7 +8,8 @@ class RtcsharePlugin:
         context.register_service('isa', IsaService)
 
 class IsaService:
-    def handle_query(query: dict, *, dir: str) -> Tuple[dict, bytes]:
+    def handle_query(query: dict, *, dir: str, user_id: Union[str, None]=None) -> Tuple[dict, bytes]:
+        # todo: authenticate user
         type0 = query['type']
         if type0 == 'set_annotations':
             session_path = query['session_path']

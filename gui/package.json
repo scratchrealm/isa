@@ -19,12 +19,14 @@
     "@mui/icons-material": "^5.11.9",
     "@mui/material": "^5.11.10",
     "buffer": "^6.0.3",
+    "colormap": "^2.3.2",
     "js-yaml": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1"
   },
   "devDependencies": {
+    "@types/colormap": "^2.3.1",
     "@types/js-yaml": "^4.0.5",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",

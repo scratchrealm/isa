@@ -1,6 +1,7 @@
 import { DefaultToolbarWidth, TimeScrollView, TimeScrollViewPanel, usePanelDimensions, useTimeseriesSelectionInitialization, useTimeRange, useTimeseriesMargins } from "@figurl/timeseries-views";
 import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
 import SpectrogramClient from "./SpectrogramClient";
+import colormap from 'colormap';
 
 type Props ={
 	width: number
@@ -147,8 +148,21 @@ const determinePower3DownsampleFactor = (n: number, target: number) => {
 	return factor
 }
 
-const colorForSpectrogramValue = (v: number) => {
-	return v > 0 ? [0, 0, 0, v * 10] : [0, 0, 0, 0]
+const colors = colormap({
+    colormap: 'bone',
+    nshades: 100,
+    format: 'float',
+    alpha: 1
+})
+
+const scale = 50
+
+function colorForSpectrogramValue(v: number) {
+	if (isNaN(v)) return [0, 0, 0, 0]
+	const v2 = Math.min(99, Math.max(0, Math.floor(v / 255 * 100 * scale)))
+	if (!v2) return [0, 0, 0, 0]
+	const ret = colors[99 - v2]
+	return ret.map(v => (Math.floor(v * 255)))
 }
 
 export default SpectrogramWidget

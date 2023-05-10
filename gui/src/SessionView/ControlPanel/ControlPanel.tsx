@@ -62,21 +62,17 @@ const ControlPanel: FunctionComponent<Props> = ({width, height}) => {
 	}, [object])
 
 	const handleSave = useCallback(() => {
-		console.log('--- debug 1')
 		if (!object) return
-		console.log('--- debug 2')
 		const x = JSONStringifyDeterministic(object)
 		setSaving(true)
 		setErrorString('')
 		;(async () => {
 			try {
-				console.log('--- debug 3')
 				await serviceQuery('isa', {
 					type: 'set_annotations',
 					session_path: '$dir',
 					annotations: object
 				})
-				console.log('--- debug 4')
 				setSaveState({
 					savedObjectJson: x
 				})

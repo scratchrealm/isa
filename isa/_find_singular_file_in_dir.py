@@ -15,5 +15,6 @@ def _find_singular_file_in_dir(dirname: str, extensions: Union[str, list[str]]):
     if len(matching_fnames) == 0:
         return None
     if len(matching_fnames) > 1:
-        raise Exception(f'More than one {extension} file found in directory: {dirname}')
+        extensions_string = ', '.join(extensions)
+        raise Exception(f'More than one ({extensions_string}) file found in directory: {dirname}')
     return matching_fnames[0]
