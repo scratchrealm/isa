@@ -21,6 +21,8 @@ def auto_detect_vocalizations(session: str, output_json_fname: str):
         print(f'Generating annotations.json from {csv_fname}')
         csv_path = f'{dirname}/{csv_fname}'
         annotations = _generate_annotations_from_csv(csv_path, sampling_frequency=config['audio_sr_hz'])
+        with open(output_json_fname, 'w') as f:
+            json.dump(annotations, f, indent=4)
         return
 
     auto_detect_freq_range = config['auto_detect_freq_range']
