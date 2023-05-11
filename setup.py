@@ -8,7 +8,8 @@ setup(
         'click',
         'h5py',
         'zarr',
-        'matplotlib'
+        'matplotlib',
+        'opencv-python'
     ],
     entry_points={
         'console_scripts': [
