@@ -17,9 +17,7 @@ Install isa-ssl from PyPI:
 pip install isa-ssl
 ```
 
-Install rtcshare
-
-Todo: provide instructions for rtcshare
+Install [rtcshare](https://github.com/scratchrealm/rtcshare)
 
 ## Create a project
 
@@ -89,3 +87,14 @@ isa init
 # replace SESSION_ID with the session ID
 isa update --session SESSION_ID
 ```
+
+## Viewing the project
+
+To view the project, you must have a running instance of rtcshare
+
+```bash
+cd my-project
+rtcshare start --dir . --plugins isa
+```
+
+Then open the rtcshare URL in a browser. You will see a file browser in the left panel. Navigate to the session you want to view and click on the view.yaml file. Then click "open in figurl".
