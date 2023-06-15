@@ -1,5 +1,5 @@
 projectName: isa-ssl
-pythonProjectVersion: 0.2.1
+pythonProjectVersion: 0.2.2
 projectAuthor: Jeremy Magland and Ralph Peterson
 projectAuthorEmail: jmagland@flatironinstitute.org
 projectDescription: "Isa (Ee-suh) is a visualization and annotation tool for sound source location."
