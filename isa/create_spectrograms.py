@@ -40,7 +40,7 @@ def create_spectrograms(session: str):
     audio_path = f'{dirname}/{audio_fname}'
 
     print('Extracting audio signals')
-    if audio_path.endswith('.h5') is not None:
+    if audio_path.endswith('.h5'):
         with h5py.File(audio_path, 'r') as f:
             ch1 = np.array(f['ai_channels/ai0'])
             ch2 = np.array(f['ai_channels/ai1'])
